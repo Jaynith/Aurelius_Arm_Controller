@@ -14,8 +14,8 @@ void potentiometerSetup(struct potentiometer_data * setup_data, int input_pin, i
   setup_data->scale_lower_bound = scale_lower_bound;
 }
 
-uint16_t readPotentiometer(struct potentiometer_data * input_data){
+int readPotentiometer(struct potentiometer_data * input_data){
   int potentiometer_val = analogRead(input_data->pot_pin);
 
-  return (uint16_t)map(potentiometer_val, 0, input_data->max_v, input_data->scale_lower_bound, input_data->scale_upper_bound);
+  return map(potentiometer_val, 0, input_data->max_v, input_data->scale_lower_bound, input_data->scale_upper_bound);
 }

@@ -7,18 +7,6 @@
 #include "libraries.h"
 #include "stepper_controller.h"
 
-uint8_t stepper_controller::_motor_pin, stepper_controller::_direction_pin, stepper_controller::_enable_pin;
-uint16_t stepper_controller::_steps_for_full_turn;
-float   stepper_controller::_gear_reduction;
-uint8_t stepper_controller::_limit_switch_pin;
-
-uint16_t stepper_controller::_step_delay_uS;
-float stepper_controller::_current_angle;
-float stepper_controller::_motor_upper_limit_angle;
-
-bool stepper_controller::_motor_calibrated;
-bool stepper_controller::_limit_switch_ready;
-
 stepper_controller::stepper_controller(uint8_t motor_pin, uint8_t direction_pin, uint8_t enable_pin, uint16_t steps_for_full_turn, float gear_reduction){
   _motor_pin = motor_pin;
   _direction_pin = direction_pin;
@@ -58,13 +46,14 @@ void stepper_controller::setupLimitSwitch(uint8_t limit_switch_pin){
 }
 
 void stepper_controller::turn(float angle){
+  //Serial.println(_current_angle);
   if (angle > _motor_upper_limit_angle)
     angle = _motor_upper_limit_angle;
   else if (angle < 0)
     angle = 0;
   float delta_angle = angle - _current_angle;
   int steps = _steps_for_full_turn * _gear_reduction * delta_angle / 360;
-  if (_motor_calibrated == true){
+  if (_motor_calibrated == true || _motor_calibrated == false){
     if (steps >= 0)
       prepMotor(CCW);
     else {
@@ -88,7 +77,11 @@ bool stepper_controller::calibrateMotor(){
   else {
     prepMotor(CW);
     while (switch_hit == HIGH && step_count <= 10000){
-      switch_hit = digitalRead(_limit_switch_pin);
+      if (analogRead(_limit_switch_pin)>700)
+        switch_hit = HIGH;
+      else
+        switch_hit = LOW;
+      //switch_hit = digitalRead(_limit_switch_pin);
       step_count++;
       stepMotor();
     }
