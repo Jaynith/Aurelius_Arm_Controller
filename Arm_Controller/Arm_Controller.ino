@@ -4,6 +4,7 @@
 *Purpose : Drive 6 axis robot arm actuated by stepper and servo motors.
 */
 
+#include "libraries.h"
 #include "potentiometer.h"
 #include "stepper_controller.h"
 
